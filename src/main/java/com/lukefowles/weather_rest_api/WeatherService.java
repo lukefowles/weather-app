@@ -1,15 +1,10 @@
 package com.lukefowles.weather_rest_api;
 
-import netscape.javascript.JSObject;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.time.Instant;
-import java.util.Map;
+import java.util.Optional;
+
 
 @Service
 public class WeatherService {
@@ -24,8 +19,13 @@ public class WeatherService {
     WeatherResponse getWeatherResponse(String city, String country) {
         String location = getLocationFromRequest(city, country);
         OpenWeatherApiCall entry = apiCallRepo.getApiCallByLocation(location)
-                .orElseGet(() -> callOpenWeatherAPI(location));
+                .filter(this::isEntryStale)
+                .orElseGet(() ->callOpenWeatherAPI(location));
         return new WeatherResponse(entry.getDescription());
+    }
+
+    private boolean isEntryStale(OpenWeatherApiCall entry) {
+        return entry.getRequestTime().isAfter(Instant.now().minusSeconds(300));
     }
 
     private OpenWeatherApiCall callOpenWeatherAPI(String location) {
@@ -51,9 +51,17 @@ public class WeatherService {
 ////                        (req, resp) -> {throw new LocationNotFoundException(LOCATION_NOT_FOUND);})
 //                .body(OpenWeatherApiResponse.class);
         OpenWeatherApiCall apiCallRecord = new OpenWeatherApiCall(location, Instant.now(), response.getWeather().get(0).getDescription());
-        System.out.println("hit");
-        apiCallRepo.save(apiCallRecord);
+        updateOrInsertToRepo(apiCallRecord);
         return apiCallRecord;
+    }
+
+    private void updateOrInsertToRepo(OpenWeatherApiCall apiCallRecord) {
+        apiCallRepo.getApiCallByLocation(apiCallRecord.getLocation())
+                .ifPresentOrElse(entry -> {
+                    entry.setDescription(apiCallRecord.getDescription());
+                    entry.setRequestTime(apiCallRecord.getRequestTime());
+                    apiCallRepo.save(entry);},
+                            () -> apiCallRepo.save(apiCallRecord));
     }
 
 

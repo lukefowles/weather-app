@@ -42,11 +42,26 @@ public class WeatherServiceTests {
     }
 
     @Test
-    void shouldReturnWeatherResponseWhenNotPresentInDb() throws IOException {
+    void shouldReturnWeatherResponseWhenNotPresentInDb() {
         OpenWeatherApiCall expectedApiCallSave = new OpenWeatherApiCall("Turin, IT", Instant.now(), "moderate rain");
         WeatherResponse expectedResponse = new WeatherResponse("moderate rain");
         OpenWeatherApiResponse mockedApiResponse = new OpenWeatherApiResponse(List.of(new Weather("moderate rain")));
         when(apiCallRepo.getApiCallByLocation("Turin, IT")).thenReturn(Optional.empty());
+        when(restCallHandler.callOpenWeatherApi("Turin, IT")).thenReturn(mockedApiResponse);
+        assertThat(weatherService.getWeatherResponse("Turin", "IT"))
+                .isEqualTo(expectedResponse);
+        verify(apiCallRepo).save(apiCallCaptor.capture());
+        assertThat(apiCallCaptor.getValue().getDescription()).isEqualTo(expectedApiCallSave.getDescription());
+        assertThat(apiCallCaptor.getValue().getLocation()).isEqualTo(expectedApiCallSave.getLocation());
+    }
+
+    @Test
+    void shouldReturnWeatherResponseFromOpenWeatherWhenDbEntryIsStale() {
+        OpenWeatherApiCall staleApiCall = new OpenWeatherApiCall("Turin, IT", Instant.now().minusSeconds(301), "sunny");
+        OpenWeatherApiCall expectedApiCallSave = new OpenWeatherApiCall("Turin, IT", Instant.now(), "moderate rain");
+        WeatherResponse expectedResponse = new WeatherResponse("moderate rain");
+        OpenWeatherApiResponse mockedApiResponse = new OpenWeatherApiResponse(List.of(new Weather("moderate rain")));
+        when(apiCallRepo.getApiCallByLocation("Turin, IT")).thenReturn(Optional.of(staleApiCall));
         when(restCallHandler.callOpenWeatherApi("Turin, IT")).thenReturn(mockedApiResponse);
         assertThat(weatherService.getWeatherResponse("Turin", "IT"))
                 .isEqualTo(expectedResponse);
