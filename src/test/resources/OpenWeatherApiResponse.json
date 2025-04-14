@@ -1,0 +1,48 @@
+{
+  "coord": {
+    "lon": 7.6825,
+    "lat": 45.0678
+  },
+  "weather": [
+    {
+      "id": 501,
+      "main": "Rain",
+      "description": "moderate rain",
+      "icon": "10n"
+    }
+  ],
+  "base": "stations",
+  "main": {
+    "temp": 4.53,
+    "feels_like": 2.28,
+    "temp_min": 4.19,
+    "temp_max": 5.43,
+    "pressure": 1021,
+    "humidity": 91,
+    "sea_level": 1021,
+    "grnd_level": 994
+  },
+  "visibility": 10000,
+  "wind": {
+    "speed": 2.57,
+    "deg": 300
+  },
+  "rain": {
+    "1h": 2.37
+  },
+  "clouds": {
+    "all": 100
+  },
+  "dt": 1737420543,
+  "sys": {
+    "type": 1,
+    "id": 6748,
+    "country": "IT",
+    "sunrise": 1737442800,
+    "sunset": 1737476449
+  },
+  "timezone": 3600,
+  "id": 3165524,
+  "name": "Turin",
+  "cod": 200
+}
