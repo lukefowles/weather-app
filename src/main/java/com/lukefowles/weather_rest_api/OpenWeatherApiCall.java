@@ -3,6 +3,7 @@ package com.lukefowles.weather_rest_api;
 import jakarta.annotation.Generated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
@@ -12,13 +13,24 @@ import java.time.Instant;
 public class OpenWeatherApiCall {
 
     @GeneratedValue
+    @Id
     private long id;
+    private String location;
     private Instant requestTime;
-    private OpenWeatherApiResponse openWeatherApiResponse;
+    private String description;
 
-    public OpenWeatherApiCall(OpenWeatherApiResponse openWeatherApiResponse, Instant requestTime) {
-        this.openWeatherApiResponse = openWeatherApiResponse;
+    public OpenWeatherApiCall(String location, Instant requestTime, String description) {
+        this.location = location;
         this.requestTime = requestTime;
+        this.description = description;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public Instant getRequestTime() {
@@ -29,11 +41,11 @@ public class OpenWeatherApiCall {
         this.requestTime = requestTime;
     }
 
-    public OpenWeatherApiResponse getOpenWeatherApiResponse() {
-        return openWeatherApiResponse;
+    public String getDescription() {
+        return description;
     }
 
-    public void setOpenWeatherApiResponse(OpenWeatherApiResponse openWeatherApiResponse) {
-        this.openWeatherApiResponse = openWeatherApiResponse;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
