@@ -1,28 +1,31 @@
 package com.lukefowles.weather_rest_api;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class WeatherServiceTests {
 
     @Mock
     WeatherApiCallRepository apiCallRepo;
 
+    @Mock
+    RestCallHandler restCallHandler;
+
     @InjectMocks
     WeatherService weatherService;
+
+    @Captor
+    ArgumentCaptor<OpenWeatherApiCall> apiCallCaptor;
+
 
     @BeforeEach
     public void setUp() {
@@ -40,11 +43,15 @@ public class WeatherServiceTests {
 
     @Test
     void shouldReturnWeatherResponseWhenNotPresentInDb() throws IOException {
-        String openWeatherApiResponse = FileUtils.readFileToString(new File("src/test/resources/OpenWeatherAPIResponse.json"), StandardCharsets.UTF_8);
-        OpenWeatherApiCall apiCall = new OpenWeatherApiCall("Turin, IT", Instant.now(), "moderate rain");
+        OpenWeatherApiCall expectedApiCallSave = new OpenWeatherApiCall("Turin, IT", Instant.now(), "moderate rain");
         WeatherResponse expectedResponse = new WeatherResponse("moderate rain");
+        OpenWeatherApiResponse mockedApiResponse = new OpenWeatherApiResponse(List.of(new Weather("moderate rain")));
         when(apiCallRepo.getApiCallByLocation("Turin, IT")).thenReturn(Optional.empty());
+        when(restCallHandler.callOpenWeatherApi("Turin, IT")).thenReturn(mockedApiResponse);
         assertThat(weatherService.getWeatherResponse("Turin", "IT"))
                 .isEqualTo(expectedResponse);
+        verify(apiCallRepo).save(apiCallCaptor.capture());
+        assertThat(apiCallCaptor.getValue().getDescription()).isEqualTo(expectedApiCallSave.getDescription());
+        assertThat(apiCallCaptor.getValue().getLocation()).isEqualTo(expectedApiCallSave.getLocation());
     }
 }
