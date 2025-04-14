@@ -18,7 +18,6 @@ public class WeatherController {
     @GetMapping("/weather")
     public ResponseEntity<WeatherResponse> getWeather(@RequestParam(value = "city") String city,
                                                       @RequestParam(value = "country") String country) {
-//        return new ResponseEntity<>(weatherService.getWeatherResponse(city, country), HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(weatherService.getWeatherResponse(city, country), HttpStatus.OK);
     }
 }
