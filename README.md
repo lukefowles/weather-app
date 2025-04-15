@@ -9,7 +9,7 @@ The app is designed as a REST Api with access via the *WeatherController* class.
 first queries the in-memory H2 database to see if an existing entry exists for the specified location. The db schema is as follows:
 
 | calls |
----------
+____________
 | BIGINT ID |
 | VARCHAR(255) DESCRIPTION |
 | VARCHAR(255) LOCATION |
