@@ -2,7 +2,7 @@ package com.lukefowles.weather_rest_api;
 
 import java.util.Objects;
 
-public class WeatherResponse {
+class WeatherResponse {
     private String description;
 
     public WeatherResponse(String description) {

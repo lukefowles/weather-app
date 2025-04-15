@@ -22,4 +22,4 @@ spring:
       on-profile: test
 openWeather:
   apiKey: test
-tokenLimit: 20
+tokenLimit: 2

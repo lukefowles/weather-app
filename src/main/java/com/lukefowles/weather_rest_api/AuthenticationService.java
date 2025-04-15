@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class AuthenticationService {
+class AuthenticationService {
     private static final String AUTH_TOKEN_HEADER_NAME = "X-API-KEY";
 
     private static final List<String> API_KEYS = List.of("firstKey", "secondKey", "thirdKey", "fourthKey", "fifthKey");

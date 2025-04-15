@@ -6,9 +6,9 @@ import java.time.Instant;
 
 
 @Service
-public class WeatherService {
-    private WeatherApiCallRepository apiCallRepo;
-    private RestCallHandler restCallHandler;
+class WeatherService {
+    private final WeatherApiCallRepository apiCallRepo;
+    private final RestCallHandler restCallHandler;
 
     public WeatherService(WeatherApiCallRepository apiCallRepo, RestCallHandler restCallHandler) {
         this.apiCallRepo = apiCallRepo;
@@ -22,18 +22,22 @@ public class WeatherService {
                 .findFirst()
                 .filter(this::isEntryStale)
                 .orElseGet(() -> callOpenWeatherAPI(location));
+        updateOrInsertToRepo(entry);
         return new WeatherResponse(entry.getDescription());
     }
 
     private boolean isEntryStale(OpenWeatherApiCall entry) {
-        return entry.getRequestTime().isAfter(Instant.now().minusSeconds(300));
+        if(entry.getRequestTime().isAfter(Instant.now().minusSeconds(300))) {
+            return true;
+        } else {
+            apiCallRepo.delete(entry);
+            return entry.getRequestTime().isAfter(Instant.now().minusSeconds(300));
+        }
     }
 
     private OpenWeatherApiCall callOpenWeatherAPI(String location) {
         OpenWeatherApiResponse response = restCallHandler.callOpenWeatherApi(location);
-        OpenWeatherApiCall apiCallRecord = new OpenWeatherApiCall(location, Instant.now(), response.getWeather().get(0).getDescription());
-        updateOrInsertToRepo(apiCallRecord);
-        return apiCallRecord;
+        return new OpenWeatherApiCall(location, Instant.now(), response.weather().get(0).getDescription());
     }
 
     private void updateOrInsertToRepo(OpenWeatherApiCall apiCallRecord) {
@@ -47,7 +51,6 @@ public class WeatherService {
                             () -> {
                     apiCallRepo.save(apiCallRecord);});
     }
-
 
     private String getLocationFromRequest(String city, String country) {
         return city + ", " + country;

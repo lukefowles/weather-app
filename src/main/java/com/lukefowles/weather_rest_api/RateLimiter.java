@@ -15,11 +15,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class RateLimiter implements HandlerInterceptor {
+class RateLimiter implements HandlerInterceptor {
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
     @Value("${tokenLimit}")
     private int tokenLimit;
+
+    public Bucket clearBucket(String apiKey) {
+        cache.clear();
+        return resolveBucket(apiKey);
+    }
 
     public Bucket resolveBucket(String apiKey) {
         return cache.computeIfAbsent(apiKey, this::newBucket);
