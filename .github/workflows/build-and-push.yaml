@@ -29,8 +29,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Checkout sources
         uses: actions/checkout@v4
-#      - name: Update apiKey
-#        run: sed -i 's/openWeather.apiKey/${{ secrets.API_KEY }}/g' src/main/resources/application.properties
+      - name: Update apiKey
+        run: sed -i 's/openWeather.apiKey/${{ secrets.API_KEY }}/g' src/main/resources/application.properties
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
