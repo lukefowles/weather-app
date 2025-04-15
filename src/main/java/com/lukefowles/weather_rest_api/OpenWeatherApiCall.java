@@ -1,19 +1,16 @@
 package com.lukefowles.weather_rest_api;
 
 import jakarta.annotation.Generated;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 
 @Entity
-@Table(name = "ApiCalls")
+@Table(name = "calls")
 public class OpenWeatherApiCall {
 
-    @GeneratedValue
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String location;
     private Instant requestTime;
@@ -23,6 +20,9 @@ public class OpenWeatherApiCall {
         this.location = location;
         this.requestTime = requestTime;
         this.description = description;
+    }
+
+    public OpenWeatherApiCall() {
     }
 
     public String getLocation() {

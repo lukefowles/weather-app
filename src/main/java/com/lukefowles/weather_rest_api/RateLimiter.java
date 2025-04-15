@@ -5,6 +5,7 @@ import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -17,13 +18,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RateLimiter implements HandlerInterceptor {
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
+    @Value("${tokenLimit}")
+    private int tokenLimit;
+
     public Bucket resolveBucket(String apiKey) {
         return cache.computeIfAbsent(apiKey, this::newBucket);
     }
 
     private Bucket newBucket(String apiKey) {
         return Bucket.builder()
-                .addLimit(newBandwidth(5, 1))
+                .addLimit(newBandwidth(tokenLimit, 1))
                 .build();
     }
 
