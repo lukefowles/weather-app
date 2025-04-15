@@ -27,12 +27,17 @@ class WeatherService {
     }
 
     private boolean isEntryStale(OpenWeatherApiCall entry) {
-        return entry.getRequestTime().isAfter(Instant.now().minusSeconds(300));
+        if(entry.getRequestTime().isAfter(Instant.now().minusSeconds(300))) {
+            return true;
+        } else {
+            apiCallRepo.delete(entry);
+            return entry.getRequestTime().isAfter(Instant.now().minusSeconds(300));
+        }
     }
 
     private OpenWeatherApiCall callOpenWeatherAPI(String location) {
         OpenWeatherApiResponse response = restCallHandler.callOpenWeatherApi(location);
-        return new OpenWeatherApiCall(location, Instant.now(), response.getWeather().get(0).getDescription());
+        return new OpenWeatherApiCall(location, Instant.now(), response.weather().get(0).getDescription());
     }
 
     private void updateOrInsertToRepo(OpenWeatherApiCall apiCallRecord) {
