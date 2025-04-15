@@ -36,7 +36,7 @@ public class WeatherServiceTests {
     void shouldReturnWeatherResponseFromDb() {
         OpenWeatherApiCall apiCall = new OpenWeatherApiCall("Melbourne, AU", Instant.now(), "Sunny");
         WeatherResponse expectedResponse = new WeatherResponse("Sunny");
-        when(apiCallRepo.getApiCallByLocation("Melbourne, AU")).thenReturn(Optional.of(apiCall));
+        when(apiCallRepo.findByLocation("Melbourne, AU")).thenReturn(List.of(apiCall));
         assertThat(weatherService.getWeatherResponse("Melbourne", "AU"))
                 .isEqualTo(expectedResponse);
     }
@@ -46,7 +46,7 @@ public class WeatherServiceTests {
         OpenWeatherApiCall expectedApiCallSave = new OpenWeatherApiCall("Turin, IT", Instant.now(), "moderate rain");
         WeatherResponse expectedResponse = new WeatherResponse("moderate rain");
         OpenWeatherApiResponse mockedApiResponse = new OpenWeatherApiResponse(List.of(new Weather("moderate rain")));
-        when(apiCallRepo.getApiCallByLocation("Turin, IT")).thenReturn(Optional.empty());
+        when(apiCallRepo.findByLocation("Turin, IT")).thenReturn(List.of());
         when(restCallHandler.callOpenWeatherApi("Turin, IT")).thenReturn(mockedApiResponse);
         assertThat(weatherService.getWeatherResponse("Turin", "IT"))
                 .isEqualTo(expectedResponse);
@@ -61,7 +61,7 @@ public class WeatherServiceTests {
         OpenWeatherApiCall expectedApiCallSave = new OpenWeatherApiCall("Turin, IT", Instant.now(), "moderate rain");
         WeatherResponse expectedResponse = new WeatherResponse("moderate rain");
         OpenWeatherApiResponse mockedApiResponse = new OpenWeatherApiResponse(List.of(new Weather("moderate rain")));
-        when(apiCallRepo.getApiCallByLocation("Turin, IT")).thenReturn(Optional.of(staleApiCall));
+        when(apiCallRepo.findByLocation("Turin, IT")).thenReturn(List.of(staleApiCall));
         when(restCallHandler.callOpenWeatherApi("Turin, IT")).thenReturn(mockedApiResponse);
         assertThat(weatherService.getWeatherResponse("Turin", "IT"))
                 .isEqualTo(expectedResponse);
