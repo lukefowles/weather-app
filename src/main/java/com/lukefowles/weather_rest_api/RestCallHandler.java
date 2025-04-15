@@ -29,6 +29,7 @@ public class RestCallHandler {
                 .uri(uriBuilder -> {
                     return uriBuilder
                             .queryParam("q", location)
+                            .queryParam("appId", apiKey)
                             .build();
                 })
                 .retrieve()
