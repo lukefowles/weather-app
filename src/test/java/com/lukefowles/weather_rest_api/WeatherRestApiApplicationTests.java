@@ -4,13 +4,10 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.matchers.Times;
 import org.mockserver.model.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -65,12 +62,10 @@ class WeatherRestApiApplicationTests {
 	}
 
 	@Test
-	@Order(1)
 	void contextLoads() {
 	}
 
 	@Test
-	@Order(1)
 	void getWeatherReturnsCorrectResponseAnd200() throws IOException {
 		String weatherAPIResponse = FileUtils.readFileToString(new File("src/test/resources/OpenWeatherApiResponse.json"), StandardCharsets.UTF_8);
 
@@ -97,7 +92,6 @@ class WeatherRestApiApplicationTests {
 	}
 
 	@Test
-	@Order(2)
 	void getWeatherReturnsCorrectResponseAnd200Dupe() throws IOException {
 		String weatherAPIResponse = FileUtils.readFileToString(new File("src/test/resources/OpenWeatherApiResponse.json"), StandardCharsets.UTF_8);
 
@@ -124,13 +118,12 @@ class WeatherRestApiApplicationTests {
 	}
 
 	@Test
-	@Order(2)
 	void getWeatherReturnsResponseFromDbAnd200ForDuplicateRequests() throws IOException {
 		String weatherAPIResponse = FileUtils.readFileToString(new File("src/test/resources/OpenWeatherApiResponse.json"), StandardCharsets.UTF_8);
 
 		mockServerClient
 				.when(
-						request().withMethod("GET")
+						request().withMethod("GET"), Times.exactly(1)
 				)
 				.respond(
 						response()
@@ -161,4 +154,113 @@ class WeatherRestApiApplicationTests {
 
 	}
 
+	@Test
+	void getWeatherReturns401WhenIncorrectApiKey() {
+		given()
+				.contentType(ContentType.JSON)
+				.when()
+				.header("X-API-KEY", "incorrect key")
+				.param("city", "Turin")
+				.param("country", "IT")
+				.get("/weather")
+				.then()
+				.statusCode(401);
+	}
+
+//	@Test
+//	void getWeatherReturnsRateLimitExceptionWhenCalled6Times() throws IOException {
+//		String weatherAPIResponse = FileUtils.readFileToString(new File("src/test/resources/OpenWeatherApiResponse.json"), StandardCharsets.UTF_8);
+//
+//		mockServerClient
+//				.when(
+//						request().withMethod("GET"), Times.exactly(1)
+//				)
+//				.respond(
+//						response()
+//								.withStatusCode(200)
+//								.withContentType(MediaType.APPLICATION_JSON)
+//								.withBody(json(weatherAPIResponse)));
+//		for (int i=0; i < 5; i++) {
+//			given()
+//					.contentType(ContentType.JSON)
+//					.when()
+//					.header("X-API-KEY", "test")
+//					.param("city", "Turin")
+//					.param("country", "IT")
+//					.get("/weather")
+//					.then()
+//					.statusCode(200);
+//		}
+//		given()
+//				.contentType(ContentType.JSON)
+//				.when()
+//				.header("X-API-KEY", "test")
+//				.param("city", "Turin")
+//				.param("country", "IT")
+//				.get("/weather")
+//				.then()
+//				.statusCode(429);
+//	}
+
+	@Test
+	void getWeatherReturns404StatusCodeWhenLocationNotFound() {
+		mockServerClient
+				.when(
+						request().withMethod("GET"), Times.exactly(1)
+				)
+				.respond(
+						response()
+								.withStatusCode(404));
+
+		given()
+				.contentType(ContentType.JSON)
+				.when()
+				.header("X-API-KEY", "test")
+				.param("city", "Turin")
+				.param("country", "IT")
+				.get("/weather")
+				.then()
+				.statusCode(404);
+	}
+
+	@Test
+	void getWeatherReturns5xxErrorWhenOpenWeatherReturns5xxError() {
+		mockServerClient
+				.when(
+						request().withMethod("GET"), Times.exactly(1)
+				)
+				.respond(
+						response()
+								.withStatusCode(500));
+
+		given()
+				.contentType(ContentType.JSON)
+				.when()
+				.header("X-API-KEY", "test")
+				.param("city", "Turin")
+				.param("country", "IT")
+				.get("/weather")
+				.then()
+				.statusCode(502);
+	}
+
+	@Test
+	void getWeatherReturns400ErrorWhenMissingParam() {
+		mockServerClient
+				.when(
+						request().withMethod("GET"), Times.exactly(1)
+				)
+				.respond(
+						response()
+								.withStatusCode(500));
+
+		given()
+				.contentType(ContentType.JSON)
+				.when()
+				.header("X-API-KEY", "test")
+				.param("city", "Turin")
+				.get("/weather")
+				.then()
+				.statusCode(400);
+	}
 }
