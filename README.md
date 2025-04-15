@@ -11,13 +11,9 @@ first queries the in-memory H2 database to see if an existing entry exists for t
 | calls |
 ---------
 | BIGINT ID |
-----------
 | VARCHAR(255) DESCRIPTION |
---------------
 | VARCHAR(255) LOCATION |
---------------
 | TIMESTAMPS WITH TIMEZONE |
-------
 
 The requestTime is stored within the db in order to check if existing entries are recent enough to be returned as a response to the client.
 Since only a general description of the weather is being provided, it is assumed that any db entry within 5 minutes of the 
