@@ -13,7 +13,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
 openWeather:
   baseURI: https://api.openweathermap.org/data/2.5/weather
-  apiKey: test
+  apiKey: ${apiKey}
 tokenLimit: 5
 ---
 spring:
