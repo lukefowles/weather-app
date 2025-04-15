@@ -5,10 +5,10 @@ to the user. The endpoints for the project are:
 - /weather : GET HttpMethod which returns a description of the weather at a given location.
 
 ## Design
-The app is designed as a REST Api with access via the *WeatherController* class. From here, the *WeatherService* class
+The app is designed as a REST Api with access via the WeatherController class. From there, the WeatherService class
 first queries the in-memory H2 database to see if an existing entry exists for the specified location. The db schema is as follows:
 
-| calls                                |
+| requests                             |
 |--------------------------------------|
 | BIGINT ID                            |
 | VARCHAR(255) DESCRIPTION             |
@@ -19,6 +19,7 @@ The requestTime is stored within the db in order to check if existing entries ar
 Since only a general description of the weather is being provided, it is assumed that any db entry within 5 minutes of the 
 request time can be returned to the client, as to reduce the number of external OpenWeather API calls. If no such entry exists,
 then the service will call the OpenWeather API, returning the response to the client and updating the DB with a record of the request.
+As it is assumed there is no requirement to persist these requests long term, the H2 database is in-memory.
 
 ## API rate limit and keys
 5 api keys have been generated for the app to be passed as an x-api-key request header. The keys in this case are
@@ -29,7 +30,7 @@ arbitrary a listed below:
 - fourthKey
 - fifthKey
 
-A rate limiter utilising the external library *bucket4j* has been added to limit requests to 5 per hour
+A rate limiter utilising the external library bucket4j has been added to limit requests to 5 per hour
 for each api key
 
 ## Running the app locally
@@ -41,7 +42,7 @@ pull the image from the registry:
 docker pull ghcr.io/lukefowles/weather-app:main
 ```
 Note that you may be prompted to perform a docker login at this stage. 
-Once you have pulled the image (please ensure you have a valid PAT token associated with your GitHub and added to your local machine), 
+Once you have pulled the image (please ensure you have a valid [PAT token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) associated with your GitHub and added to your local machine), 
 you can run the application and map to
 local port 8080 using the following command:
 ```shell
