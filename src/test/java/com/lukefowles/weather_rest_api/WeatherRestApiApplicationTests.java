@@ -3,11 +3,12 @@ package com.lukefowles.weather_rest_api;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.matchers.Times;
 import org.mockserver.model.MediaType;
+import org.mockserver.verify.VerificationTimes;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -34,6 +35,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ActiveProfiles("test")
 class WeatherRestApiApplicationTests {
 
+	@Autowired
+	WeatherApiCallRepository weatherApiCallRepository;
+
+	@Autowired
+	RateLimiter rateLimiter;
+
 	@LocalServerPort
 	private int port;
 
@@ -59,10 +66,8 @@ class WeatherRestApiApplicationTests {
 	public void beforeEach() {
 		RestAssured.port = port;
 		mockServerClient.reset();
-	}
-
-	@Test
-	void contextLoads() {
+		weatherApiCallRepository.deleteAll();
+		rateLimiter.clearBucket("firstKey");
 	}
 
 	@Test
@@ -91,40 +96,13 @@ class WeatherRestApiApplicationTests {
 				.body("description", is("moderate rain"));
 	}
 
-	@Test
-	void getWeatherReturnsCorrectResponseAnd200Dupe() throws IOException {
-		String weatherAPIResponse = FileUtils.readFileToString(new File("src/test/resources/OpenWeatherApiResponse.json"), StandardCharsets.UTF_8);
-
-		mockServerClient
-				.when(
-						request().withMethod("GET")
-				)
-				.respond(
-						response()
-								.withStatusCode(200)
-								.withContentType(MediaType.APPLICATION_JSON)
-								.withBody(json(weatherAPIResponse)));
-
-		given()
-				.contentType(ContentType.JSON)
-				.when()
-				.header("X-API-KEY", "secondKey")
-				.param("city", "Turin")
-				.param("country", "IT")
-				.get("/weather")
-				.then()
-				.statusCode(200)
-				.body("description", is("moderate rain"));
-	}
 
 	@Test
 	void getWeatherReturnsResponseFromDbAnd200ForDuplicateRequests() throws IOException {
 		String weatherAPIResponse = FileUtils.readFileToString(new File("src/test/resources/OpenWeatherApiResponse.json"), StandardCharsets.UTF_8);
 
 		mockServerClient
-				.when(
-						request().withMethod("GET"), Times.exactly(1)
-				)
+				.when(request().withMethod("GET"))
 				.respond(
 						response()
 								.withStatusCode(200)
@@ -144,14 +122,15 @@ class WeatherRestApiApplicationTests {
 		given()
 				.contentType(ContentType.JSON)
 				.when()
-				.header("X-API-KEY", "thirdKey")
+				.header("X-API-KEY", "firstKey")
 				.param("city", "Turin")
 				.param("country", "IT")
 				.get("/weather")
 				.then()
 				.statusCode(200)
 				.body("description", is("moderate rain"));
-
+		mockServerClient.verify(request().withMethod("GET"),
+				VerificationTimes.exactly(1));
 	}
 
 	@Test
@@ -167,41 +146,6 @@ class WeatherRestApiApplicationTests {
 				.statusCode(401);
 	}
 
-//	@Test
-//	void getWeatherReturnsRateLimitExceptionWhenCalled6Times() throws IOException {
-//		String weatherAPIResponse = FileUtils.readFileToString(new File("src/test/resources/OpenWeatherApiResponse.json"), StandardCharsets.UTF_8);
-//
-//		mockServerClient
-//				.when(
-//						request().withMethod("GET"), Times.exactly(1)
-//				)
-//				.respond(
-//						response()
-//								.withStatusCode(200)
-//								.withContentType(MediaType.APPLICATION_JSON)
-//								.withBody(json(weatherAPIResponse)));
-//		for (int i=0; i < 5; i++) {
-//			given()
-//					.contentType(ContentType.JSON)
-//					.when()
-//					.header("X-API-KEY", "test")
-//					.param("city", "Turin")
-//					.param("country", "IT")
-//					.get("/weather")
-//					.then()
-//					.statusCode(200);
-//		}
-//		given()
-//				.contentType(ContentType.JSON)
-//				.when()
-//				.header("X-API-KEY", "test")
-//				.param("city", "Turin")
-//				.param("country", "IT")
-//				.get("/weather")
-//				.then()
-//				.statusCode(429);
-//	}
-
 	@Test
 	void getWeatherReturns404StatusCodeWhenLocationNotFound() {
 		mockServerClient
@@ -215,7 +159,7 @@ class WeatherRestApiApplicationTests {
 		given()
 				.contentType(ContentType.JSON)
 				.when()
-				.header("X-API-KEY", "fourthKey")
+				.header("X-API-KEY", "firstKey")
 				.param("city", "Turin")
 				.param("country", "IT")
 				.get("/weather")
@@ -236,7 +180,7 @@ class WeatherRestApiApplicationTests {
 		given()
 				.contentType(ContentType.JSON)
 				.when()
-				.header("X-API-KEY", "fifthKey")
+				.header("X-API-KEY", "firstKey")
 				.param("city", "Turin")
 				.param("country", "IT")
 				.get("/weather")
@@ -257,10 +201,45 @@ class WeatherRestApiApplicationTests {
 		given()
 				.contentType(ContentType.JSON)
 				.when()
-				.header("X-API-KEY", "fifthKey")
+				.header("X-API-KEY", "firstKey")
 				.param("city", "Turin")
 				.get("/weather")
 				.then()
 				.statusCode(400);
+	}
+
+	@Test
+	void getWeatherReturns429WhenRateLimitExceeded() throws IOException {
+		String weatherAPIResponse = FileUtils.readFileToString(new File("src/test/resources/OpenWeatherApiResponse.json"), StandardCharsets.UTF_8);
+		mockServerClient
+			.when(
+					request().withMethod("GET")
+			)
+			.respond(
+					response()
+							.withStatusCode(200)
+							.withContentType(MediaType.APPLICATION_JSON)
+							.withBody(json(weatherAPIResponse)));
+		for(int i=0; i<2; i++) {
+			given()
+					.contentType(ContentType.JSON)
+					.when()
+					.header("X-API-KEY", "firstKey")
+					.param("city", "Turin")
+					.param("country", "IT")
+					.get("/weather")
+					.then()
+					.statusCode(200)
+					.body("description", is("moderate rain"));
+		}
+		given()
+				.contentType(ContentType.JSON)
+				.when()
+				.header("X-API-KEY", "firstKey")
+				.param("city", "Turin")
+				.param("country", "IT")
+				.get("/weather")
+				.then()
+				.statusCode(429);
 	}
 }

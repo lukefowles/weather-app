@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 import static com.lukefowles.weather_rest_api.Constants.*;
 
 @Component
-public class RestCallHandler {
+class RestCallHandler {
 
     private final RestClient restClient;
 
