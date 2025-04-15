@@ -27,12 +27,7 @@ class WeatherService {
     }
 
     private boolean isEntryStale(OpenWeatherApiCall entry) {
-        if(entry.getRequestTime().isAfter(Instant.now().minusSeconds(300))) {
-            return true;
-        } else {
-            apiCallRepo.delete(entry);
-            return entry.getRequestTime().isAfter(Instant.now().minusSeconds(300));
-        }
+        return entry.getRequestTime().isAfter(Instant.now().minusSeconds(300));
     }
 
     private OpenWeatherApiCall callOpenWeatherAPI(String location) {
