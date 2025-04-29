@@ -1,4 +1,4 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,7 +14,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-class AuthenticationFilter extends GenericFilterBean {
+public class AuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)

@@ -1,12 +1,15 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.weather;
 
+import com.lukefowles.exception.APIServerException;
+import com.lukefowles.exception.BadRequestException;
+import com.lukefowles.exception.LocationNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import static com.lukefowles.weather_rest_api.Constants.*;
+import static com.lukefowles.weather.Constants.*;
 
 @Component
 class RestCallHandler {

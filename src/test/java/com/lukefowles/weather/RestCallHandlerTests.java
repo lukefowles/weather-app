@@ -1,7 +1,10 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.weather;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lukefowles.exception.APIServerException;
+import com.lukefowles.exception.BadRequestException;
+import com.lukefowles.exception.LocationNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;

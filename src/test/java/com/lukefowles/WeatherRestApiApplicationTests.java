@@ -1,5 +1,7 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles;
 
+import com.lukefowles.security.RateLimiter;
+import com.lukefowles.weather.WeatherApiCallRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.apache.commons.io.FileUtils;

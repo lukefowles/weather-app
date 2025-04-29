@@ -1,4 +1,4 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.weather;
 
 import java.util.List;
 import java.util.Objects;
