@@ -1,4 +1,4 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.security;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-class RateLimiter implements HandlerInterceptor {
+public class RateLimiter implements HandlerInterceptor {
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
     @Value("${tokenLimit}")

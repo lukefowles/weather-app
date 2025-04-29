@@ -1,5 +1,6 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.config;
 
+import com.lukefowles.security.AuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;

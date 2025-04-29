@@ -1,7 +1,6 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.security;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-class AuthenticationService {
+public class AuthenticationService {
     private static final String AUTH_TOKEN_HEADER_NAME = "X-API-KEY";
 
     private static final List<String> API_KEYS = List.of("firstKey", "secondKey", "thirdKey", "fourthKey", "fifthKey");

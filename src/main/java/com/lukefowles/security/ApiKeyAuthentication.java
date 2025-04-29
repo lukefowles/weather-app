@@ -1,11 +1,11 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.security;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-class ApiKeyAuthentication extends AbstractAuthenticationToken {
+public class ApiKeyAuthentication extends AbstractAuthenticationToken {
     private final String apiKey;
 
     public ApiKeyAuthentication(String apiKey, Collection<? extends GrantedAuthority> authorities) {

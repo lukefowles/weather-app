@@ -1,4 +1,4 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.weather;
 
 class Constants {
     static final String API_SERVER_EXCEPTION = "Server Error";

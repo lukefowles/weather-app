@@ -1,5 +1,6 @@
-package com.lukefowles.weather_rest_api;
+package com.lukefowles.config;
 
+import com.lukefowles.security.RateLimiter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
