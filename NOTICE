@@ -1,0 +1,22 @@
+NOTICE
+
+This project uses the following open-source libraries:
+
+- Spring Boot: Apache License 2.0
+  - https://opensource.org/licenses/Apache-2.0
+- Bucket4j: Apache License 2.0
+  - https://opensource.org/licenses/Apache-2.0
+- H2 Database: Eclipse Public License 2.0
+  - https://www.eclipse.org/legal/epl-2.0/
+- JUnit: Eclipse Public License 2.0
+  - https://www.eclipse.org/legal/epl-2.0/
+- AssertJ: Apache License 2.0
+  - https://opensource.org/licenses/Apache-2.0
+- Testcontainers: Apache License 2.0
+  - https://opensource.org/licenses/Apache-2.0
+- MockServer: Apache License 2.0
+  - https://opensource.org/licenses/Apache-2.0
+- Rest-Assured: Apache License 2.0
+  - https://opensource.org/licenses/Apache-2.0
+- Commons IO: Apache License 2.0
+  - https://opensource.org/licenses/Apache-2.0
